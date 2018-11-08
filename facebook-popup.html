@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+
+<html>
+<head>
+ 
+  <title>Facebook Sign In Example</title>
+
+ 
+  <script src="/__/firebase/5.5.7/firebase-app.js"></script>
+  <script src="/__/firebase/5.5.7/firebase-auth.js"></script>
+  <script src="/__/firebase/init.js"></script>
+
+
+
+  <script type="text/javascript">
+
+    
+    function toggleSignIn() {
+      if (!firebase.auth().currentUser) {
+    
+        var provider = new firebase.auth.FacebookAuthProvider();
+       
+        provider.addScope('user_birthday');
+      
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+        
+          var token = result.credential.accessToken;
+        
+          var user = result.user;
+          
+          document.getElementById('quickstart-oauthtoken').textContent = token;
+
+        }).catch(function(error) {
+          
+          var errorCode = error.code;
+          var errorMessage = error.message;
+       
+          var email = error.email;
+        
+          var credential = error.credential;
+         
+          if (errorCode === 'auth/account-exists-with-different-credential') {
+            alert('You have already signed up with a different auth provider for that email.');
+            
+          } else {
+            console.error(error);
+          }
+          
+        });
+      
+      } else {
+        
+        firebase.auth().signOut();
+
+      }
+
+      document.getElementById('quickstart-sign-in').disabled = true;
+      
+    }
+    
+    function initApp() {
+     
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          
+          var displayName = user.displayName;
+          var email = user.email;
+          var emailVerified = user.emailVerified;
+          var photoURL = user.photoURL;
+          var isAnonymous = user.isAnonymous;
+          var uid = user.uid;
+          var providerData = user.providerData;
+          
+          document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
+          document.getElementById('quickstart-sign-in').textContent = 'Log out';
+          document.getElementById('quickstart-account-details').textContent = JSON.stringify(user, null, '  ');
+         
+        } else {
+          
+          document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
+          document.getElementById('quickstart-sign-in').textContent = 'Log in with Facebook';
+          document.getElementById('quickstart-account-details').textContent = 'null';
+          document.getElementById('quickstart-oauthtoken').textContent = 'null';
+         
+        }
+        
+        document.getElementById('quickstart-sign-in').disabled = false;
+        
+      });
+     
+
+      document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
+    }
+
+    window.onload = function() {
+      initApp();
+    };
+  </script>
+</head>
+<body>
+
+    
+
+  
+     
+     
+       
+          <p>Log in with your Facebook account below.</p>
+
+          
+          <button disabled class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in">Log in with Facebook</button>
+
+  
+          <div class="quickstart-user-details-container">
+            Firebase sign-in status: <span id="quickstart-sign-in-status">Unknown</span>
+            <div>Firebase auth <code>currentUser</code> object value:</div>
+            <pre><code id="quickstart-account-details">null</code></pre>
+            <div>Facebook OAuth Access Token:</div>
+            <pre><code id="quickstart-oauthtoken">null</code></pre>
+          </div>
+        
+</body>
+</html>
